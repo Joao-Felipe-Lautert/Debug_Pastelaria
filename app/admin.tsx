@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/supabaseConfig';
-import { useRouter } from 'expo-router';
 
 interface ItemPedido {
   id: string;
@@ -30,8 +29,7 @@ interface Pedido {
 export default function AdminScreen() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, signOut } = useAuth();
-  const router = useRouter();
+  const { signOut } = useAuth();
 
   const fetchAllPedidos = useCallback(async () => {
     try {
@@ -103,7 +101,7 @@ export default function AdminScreen() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.replace('/login');
+      // O RootLayout cuida do redirecionamento para /login automaticamente
     } catch (error: any) {
       Alert.alert('Erro', 'Erro ao sair');
     }

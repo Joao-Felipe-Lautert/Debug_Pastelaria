@@ -64,8 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
-    checkUser();
-
+    // Registrar o listener ANTES de chamar checkUser para evitar race condition
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Evento Supabase Auth:', event);
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -73,6 +72,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setLoading(false);
+      } else if (event === 'INITIAL_SESSION') {
+        // Evento disparado na inicialização - usar a sessão já disponível
+        await checkUser();
       }
     });
 
@@ -123,11 +125,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) throw error;
+      // O onAuthStateChange (SIGNED_IN) vai chamar checkUser automaticamente
+      // mas chamamos aqui também para garantir que o estado seja atualizado imediatamente
       await checkUser();
     } catch (error: any) {
-      throw new Error(error.message || 'Erro ao fazer login');
-    } finally {
       setLoading(false);
+      throw new Error(error.message || 'Erro ao fazer login');
     }
   };
 

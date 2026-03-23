@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -8,7 +8,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useEffect } from 'react';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  initialRouteName: '(tabs)',
 };
 
 function RootLayoutContent() {
@@ -16,8 +16,11 @@ function RootLayoutContent() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const navigationState = useRootNavigationState();
 
   useEffect(() => {
+    // Aguardar o navigator estar pronto antes de redirecionar
+    if (!navigationState?.key) return;
     if (loading) return;
 
     const inAuthGroup = segments[0] === 'login';
@@ -44,7 +47,7 @@ function RootLayoutContent() {
         }
       }
     }
-  }, [user, loading, segments, router]);
+  }, [user, loading, segments, router, navigationState?.key]);
 
   if (loading) {
     return (

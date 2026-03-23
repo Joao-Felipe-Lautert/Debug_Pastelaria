@@ -75,7 +75,6 @@ export default function CartScreen() {
 
     if (!user?.id) {
       Alert.alert('Erro', 'Você precisa estar logado para finalizar o pedido');
-      router.push('/login');
       return;
     }
 

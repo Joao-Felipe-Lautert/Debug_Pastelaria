@@ -1,5 +1,4 @@
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -11,7 +10,6 @@ export default function LoginScreen() {
   const [turma, setTurma] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
-  const router = useRouter();
 
   const handleAuth = async () => {
     // Validações
@@ -66,7 +64,7 @@ export default function LoginScreen() {
         );
       } else {
         await signIn(email.toLowerCase().trim(), password);
-        router.replace('/(tabs)');
+        // O RootLayout cuida do redirecionamento automaticamente via useEffect
       }
     } catch (error: any) {
       console.error('Erro de autenticação:', error);
