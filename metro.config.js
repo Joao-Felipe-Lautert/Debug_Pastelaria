@@ -7,4 +7,7 @@ config.resolver.alias = {
   "@": path.resolve(__dirname),
 };
 
+// Garantir que extensões web sejam resolvidas corretamente
+config.resolver.platforms = ["ios", "android", "native", "web"];
+
 module.exports = config;
