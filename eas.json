@@ -6,19 +6,30 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:assembleRelease",
+        "ndk": "25.1.8937393"
       },
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_USE_FAST_RESOLVER": "1"
+      }
     },
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "ndk": "25.1.8937393"
+      },
+      "env": {
+        "EXPO_USE_FAST_RESOLVER": "1"
       }
     }
   },
