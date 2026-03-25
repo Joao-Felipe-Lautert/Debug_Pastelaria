@@ -14,22 +14,14 @@
     "preview": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease",
-        "ndk": "25.1.8937393"
+        "gradleCommand": ":app:assembleRelease"
       },
-      "distribution": "internal",
-      "env": {
-        "EXPO_USE_FAST_RESOLVER": "1"
-      }
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle",
-        "ndk": "25.1.8937393"
-      },
-      "env": {
-        "EXPO_USE_FAST_RESOLVER": "1"
+        "buildType": "app-bundle"
       }
     }
   },

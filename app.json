@@ -20,7 +20,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.debug_pastelaria"
+      "package": "com.debug_pastelaria",
+      "jsEngine": "jsc"
     },
     "web": {
       "output": "single",
