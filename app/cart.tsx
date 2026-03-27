@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/supabaseConfig';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../supabaseConfig';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

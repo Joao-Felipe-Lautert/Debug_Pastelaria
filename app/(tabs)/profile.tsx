@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/supabaseConfig';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseConfig';
 import { useRouter } from 'expo-router';
 
 interface ItemPedido {

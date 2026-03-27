@@ -1,5 +1,5 @@
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/supabaseConfig';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
