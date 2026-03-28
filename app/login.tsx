@@ -1,6 +1,6 @@
-import { useAuth } from '../context/AuthContext';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -99,7 +99,8 @@ export default function LoginScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>🥐 Debug Pastelaria</Text>
+        <img src={require('../../assets/images/icon.png')}  alt='Logo' id='logo'></img>
+        <Text style={styles.title}>Debug Pastelaria</Text>
         <Text style={styles.subtitle}>{isSignUp ? 'Criar Conta' : 'Fazer Login'}</Text>
       </View>
 
@@ -174,17 +175,6 @@ export default function LoginScreen() {
               : 'Não tem conta? Crie uma →'}
           </Text>
         </TouchableOpacity>
-
-        {!isSignUp && (
-          <View style={styles.demoBox}>
-            <Text style={styles.demoTitle}>🧪 Dados de Teste</Text>
-            <Text style={styles.demoText}>Email: teste@example.com</Text>
-            <Text style={styles.demoText}>Senha: Teste123</Text>
-            <Text style={styles.demoNote}>
-              (Crie sua própria conta para usar o app)
-            </Text>
-          </View>
-        )}
       </View>
     </ScrollView>
   );
@@ -283,5 +273,9 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 8,
     fontStyle: 'italic',
+  },
+  logo: {
+    maxHeight: 5,
+
   },
 });
