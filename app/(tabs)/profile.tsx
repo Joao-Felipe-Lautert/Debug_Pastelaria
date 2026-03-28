@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseConfig';
-import { useRouter } from 'expo-router';
 
 interface ItemPedido {
   id: string;
@@ -43,7 +43,6 @@ export default function ProfileScreen() {
     try {
       setLoading(true);
       
-      // Buscar pedidos com itens e nomes dos produtos
       const { data: pedidosData, error: pedidosError } = await supabase
         .from('pedidos')
         .select(`
@@ -61,7 +60,6 @@ export default function ProfileScreen() {
       if (pedidosError) throw pedidosError;
       setPedidos(pedidosData || []);
 
-      // Buscar tickets do usuário
       const { data: ticketsData, error: ticketsError } = await supabase
         .from('tickets')
         .select('*')
@@ -85,7 +83,6 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     try {
       await signOut();
-      // O RootLayout cuidará do redirecionamento
     } catch (error: any) {
       console.error('Erro ao fazer logout:', error.message);
       Alert.alert('Erro', 'Erro ao fazer logout');
@@ -104,7 +101,13 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Meu Perfil</Text>
+        <View style={styles.headerLeft}>
+          <Image 
+            source={require('../../assets/images/icon.png')} 
+            style={styles.headerLogo}
+          />
+          <Text style={styles.headerTitle}>Meu Perfil</Text>
+        </View>
         <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.logoutBtn}>Sair</Text>
         </TouchableOpacity>
@@ -125,10 +128,16 @@ export default function ProfileScreen() {
             <View style={styles.ticketsContainer}>
               {tickets.map((ticket) => (
                 <View key={ticket.id} style={styles.ticketCard}>
-                  <Text style={styles.ticketLabel}>DEBUG PASTELARIA</Text>
-                  <Text style={styles.ticketTitle}>SORTEIO DE FONE DE OUVIDO!</Text>
-                  <Text style={styles.ticketLuck}>BOA SORTE!</Text>
-                  <Text style={styles.ticketNumber}>Nº {String(ticket.numero_ticket).padStart(4, '0')}</Text>
+                  <Image 
+                    source={require('../../assets/images/icon.png')} 
+                    style={styles.ticketImage}
+                  />
+                  <View style={styles.ticketInfo}>
+                    <Text style={styles.ticketLabel}>DEBUG PASTELARIA</Text>
+                    <Text style={styles.ticketTitle}>SORTEIO DE FONE DE OUVIDO!</Text>
+                    <Text style={styles.ticketNumber}>Nº {String(ticket.numero_ticket).padStart(4, '0')}</Text>
+                    <Text style={styles.ticketLuck}>BOA SORTE!</Text>
+                  </View>
                 </View>
               ))}
             </View>
@@ -151,7 +160,6 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 
-                {/* Listagem de itens do pedido */}
                 <View style={styles.itensContainer}>
                   {pedido.itens_pedido.map((item) => (
                     <Text key={item.id} style={styles.itemText}>
@@ -185,26 +193,28 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: { backgroundColor: '#D4A574', padding: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 40 },
-  headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+  headerLeft: { flexDirection: 'row', alignItems: 'center' },
+  headerLogo: { width: 30, height: 30, borderRadius: 15, marginRight: 10, borderWidth: 1, borderColor: '#fff' },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
   logoutBtn: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
   content: { flex: 1 },
-  userCard: { backgroundColor: '#fff', padding: 20, margin: 15, borderRadius: 8, elevation: 3 },
-  userName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  userEmail: { fontSize: 14, color: '#666' },
+  userCard: { backgroundColor: '#fff', padding: 20, margin: 15, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
+  userName: { fontSize: 20, fontWeight: 'bold', color: '#333' },
+  userEmail: { fontSize: 14, color: '#666', marginTop: 2 },
   userTurma: { fontSize: 14, color: '#D4A574', fontWeight: '600', marginTop: 5 },
-  admBadge: { backgroundColor: '#ff6b6b', color: '#fff', padding: 4, borderRadius: 4, fontSize: 10, fontWeight: 'bold', alignSelf: 'flex-start', marginTop: 8 },
-  section: { paddingHorizontal: 15, marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
+  admBadge: { backgroundColor: '#ff6b6b', color: '#fff', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, fontSize: 10, fontWeight: 'bold', alignSelf: 'flex-start', marginTop: 10 },
+  section: { paddingHorizontal: 15, marginBottom: 25 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 15 },
   infoText: { textAlign: 'center', color: '#999', marginVertical: 20 },
-  pedidoCard: { backgroundColor: '#fff', padding: 15, marginBottom: 10, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: '#D4A574' },
+  pedidoCard: { backgroundColor: '#fff', padding: 15, marginBottom: 12, borderRadius: 12, borderLeftWidth: 5, borderLeftColor: '#D4A574', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 },
   pedidoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   pedidoId: { fontSize: 14, fontWeight: 'bold', color: '#333' },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
   statusText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   itensContainer: { marginVertical: 10, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 10 },
-  itemText: { fontSize: 13, color: '#555', marginBottom: 2 },
+  itemText: { fontSize: 13, color: '#555', marginBottom: 4 },
   pedidoFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 },
   pedidoTotal: { fontSize: 16, fontWeight: 'bold', color: '#D4A574' },
   pedidoData: { fontSize: 12, color: '#999' },
@@ -212,9 +222,11 @@ const styles = StyleSheet.create({
   checkText: { fontSize: 12, color: '#999', marginRight: 15 },
   checkActive: { color: '#4CAF50', fontWeight: 'bold' },
   ticketsContainer: { flexDirection: 'column' },
-  ticketCard: { backgroundColor: '#FFF8E1', padding: 15, borderRadius: 8, borderWidth: 1, borderColor: '#FFE082', marginBottom: 10, alignItems: 'center' },
+  ticketCard: { backgroundColor: '#FFF8E1', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#FFE082', marginBottom: 12, flexDirection: 'row', alignItems: 'center', elevation: 2 },
+  ticketImage: { width: 60, height: 60, borderRadius: 30, marginRight: 15, borderWidth: 2, borderColor: '#D4A574' },
+  ticketInfo: { flex: 1 },
   ticketLabel: { fontSize: 10, color: '#D4A574', fontWeight: 'bold' },
-  ticketTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginVertical: 5 },
-  ticketLuck: { fontSize: 12, color: '#D4A574', fontWeight: 'bold' },
-  ticketNumber: { fontSize: 18, fontWeight: 'bold', color: '#333', marginTop: 5 },
+  ticketTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginVertical: 2 },
+  ticketNumber: { fontSize: 18, fontWeight: 'bold', color: '#D4A574' },
+  ticketLuck: { fontSize: 11, color: '#666', fontWeight: 'bold', marginTop: 2 },
 });

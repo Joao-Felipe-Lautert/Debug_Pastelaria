@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
@@ -12,7 +12,6 @@ export default function LoginScreen() {
   const { signIn, signUp } = useAuth();
 
   const handleAuth = async () => {
-    // Validações
     if (!email.trim()) {
       Alert.alert('Erro', 'Digite seu email');
       return;
@@ -64,24 +63,17 @@ export default function LoginScreen() {
         );
       } else {
         await signIn(email.toLowerCase().trim(), password);
-        // O RootLayout cuida do redirecionamento automaticamente via useEffect
       }
     } catch (error: any) {
       console.error('Erro de autenticação:', error);
-      
-      // Mensagens de erro mais específicas
       let mensagemErro = error.message || 'Erro ao autenticar. Tente novamente.';
-      
       if (mensagemErro.includes('Network request failed')) {
-        mensagemErro = 'Erro de conexão. Verifique:\n1. Sua internet está conectada?\n2. As chaves do Supabase estão corretas em supabaseConfig.ts?';
+        mensagemErro = 'Erro de conexão. Verifique sua internet.';
       } else if (mensagemErro.includes('already registered')) {
-        mensagemErro = 'Este email já está registrado. Tente fazer login ou use outro email.';
+        mensagemErro = 'Este email já está registrado.';
       } else if (mensagemErro.includes('Invalid login credentials')) {
         mensagemErro = 'Email ou senha incorretos.';
-      } else if (mensagemErro.includes('Email not confirmed')) {
-        mensagemErro = 'Email não confirmado. Verifique seu email e clique no link.';
       }
-      
       Alert.alert('Erro', mensagemErro, [{ text: 'OK' }]);
     } finally {
       setLoading(false);
@@ -99,7 +91,11 @@ export default function LoginScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <img src={require('../../assets/images/icon.png')}  alt='Logo' id='logo'></img>
+        <Image 
+          source={require('../assets/images/icon.png')} 
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.title}>Debug Pastelaria</Text>
         <Text style={styles.subtitle}>{isSignUp ? 'Criar Conta' : 'Fazer Login'}</Text>
       </View>
@@ -142,21 +138,11 @@ export default function LoginScreen() {
           placeholder="Senha (6-12 caracteres)"
           placeholderTextColor="#999"
           value={password}
-          onChangeText={(text) => {
-            if (text.length <= 24) {
-              setPassword(text);
-            }
-          }}
+          onChangeText={(text) => setPassword(text)}
           maxLength={24}
           secureTextEntry
           editable={!loading}
         />
-
-        {isSignUp && (
-          <Text style={styles.hint}>
-            💡 Use uma senha com números e letras para maior segurança
-          </Text>
-        )}
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -185,17 +171,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#D4A574',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   subtitle: {
     fontSize: 18,
@@ -213,18 +205,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#eee',
     padding: 14,
     marginBottom: 15,
     borderRadius: 8,
     fontSize: 16,
     color: '#333',
-  },
-  hint: {
-    fontSize: 12,
-    color: '#D4A574',
-    marginBottom: 15,
-    fontStyle: 'italic',
+    backgroundColor: '#f9f9f9',
   },
   button: {
     backgroundColor: '#D4A574',
@@ -267,15 +254,5 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 4,
     fontFamily: 'monospace',
-  },
-  demoNote: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 8,
-    fontStyle: 'italic',
-  },
-  logo: {
-    maxHeight: 5,
-
   },
 });
