@@ -28,7 +28,7 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image source={require('../../assets/images/icon.jpeg')} style={styles.headerLogo} />
+          <Image source={require('../../assets/images/icon.png')} style={styles.headerLogo} />
           <Text style={styles.headerTitle}>Meu Perfil</Text>
         </View>
         <TouchableOpacity onPress={() => signOut()}><Text style={styles.logoutBtn}>Sair</Text></TouchableOpacity>
@@ -43,7 +43,7 @@ export default function ProfileScreen() {
             <Text style={styles.sectionTitle}>🎟️ Meus Tickets</Text>
             {tickets.map((ticket) => (
               <View key={ticket.id} style={styles.ticketCard}>
-                <Image source={require('../../assets/images/icon.jpeg')} style={styles.ticketImage} />
+                <Image source={require('../../assets/images/icon.png')} style={styles.ticketImage} />
                 <View style={styles.ticketInfo}>
                   <Text style={styles.ticketLabel}>DEBUG PASTELARIA</Text>
                   <Text style={styles.ticketTitle}>SORTEIO DE FONE!</Text>

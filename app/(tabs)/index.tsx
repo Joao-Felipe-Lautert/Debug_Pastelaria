@@ -41,7 +41,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image source={require('../../assets/images/icon.jpeg')} style={styles.headerLogo} />
+          <Image source={require('../../assets/images/icon.png')} style={styles.headerLogo} />
           <View>
             <Text style={styles.headerTitle}>Debug Pastelaria</Text>
             <Text style={styles.headerSubtitle}>O sabor não encontrado (404)</Text>
@@ -59,7 +59,7 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>{categoria}</Text>
               {produtos.filter(p => p.categoria === categoria).map(produto => (
                 <View key={produto.id} style={styles.produtoCard}>
-                  <Image source={produto.imagem_url ? { uri: produto.imagem_url } : require('../../assets/images/icon.jpeg')} style={styles.produtoImagem} />
+                  <Image source={produto.imagem_url ? { uri: produto.imagem_url } : require('../../assets/images/icon.png')} style={styles.produtoImagem} />
                   <View style={styles.produtoInfo}>
                     <Text style={styles.produtoNome}>{produto.nome}</Text>
                     <Text style={styles.produtoPreco}>R$ {produto.preco.toFixed(2)}</Text>

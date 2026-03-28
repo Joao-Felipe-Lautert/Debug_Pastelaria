@@ -1,6 +1,6 @@
-import { useAuth } from '../context/AuthContext';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -52,7 +52,7 @@ export default function LoginScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Image source={require('../assets/images/icon.jpeg')} style={styles.logo} resizeMode="contain" />
+        <Image source={require('../assets/images/icon.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>Debug Pastelaria</Text>
         <Text style={styles.subtitle}>{isSignUp ? 'Criar Conta' : 'Fazer Login'}</Text>
       </View>
