@@ -1,192 +1,58 @@
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-
-interface ItemPedido {
-  id: string;
-  quantidade: number;
-  preco_unitario: number;
-  produtos: {
-    nome: string;
-  };
-}
-
-interface Pedido {
-  id: string;
-  total: number;
-  status: string;
-  created_at: string;
-  pagou: boolean;
-  retirou: boolean;
-  itens_pedido: ItemPedido[];
-}
-
-interface Ticket {
-  id: string;
-  numero_ticket: number;
-  pedido_id: string;
-  created_at: string;
-}
+import { supabase } from '../../supabaseConfig';
 
 export default function ProfileScreen() {
-  const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, signOut } = useAuth();
-  const router = useRouter();
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return;
-    
     try {
       setLoading(true);
-      
-      const { data: pedidosData, error: pedidosError } = await supabase
-        .from('pedidos')
-        .select(`
-          *,
-          itens_pedido (
-            id,
-            quantidade,
-            preco_unitario,
-            produtos (nome)
-          )
-        `)
-        .eq('usuario_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (pedidosError) throw pedidosError;
-      setPedidos(pedidosData || []);
-
-      const { data: ticketsData, error: ticketsError } = await supabase
-        .from('tickets')
-        .select('*')
-        .eq('usuario_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (ticketsError) throw ticketsError;
-      setTickets(ticketsData || []);
-
+      const { data, error } = await supabase.from('tickets').select('*').eq('usuario_id', user?.id);
+      if (error) throw error;
+      setTickets(data || []);
     } catch (error: any) {
-      console.error('Erro ao buscar dados:', error.message);
+      console.error(error.message);
     } finally {
       setLoading(false);
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } catch (error: any) {
-      console.error('Erro ao fazer logout:', error.message);
-      Alert.alert('Erro', 'Erro ao fazer logout');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pendente': return '#FFA500';
-      case 'pago': return '#4CAF50';
-      case 'retirado': return '#2196F3';
-      default: return '#999';
-    }
-  };
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image 
-            source={require('../../assets/images/icon.png')} 
-            style={styles.headerLogo}
-          />
+          <Image source={require('../../assets/images/icon.jpeg')} style={styles.headerLogo} />
           <Text style={styles.headerTitle}>Meu Perfil</Text>
         </View>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logoutBtn}>Sair</Text>
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => signOut()}><Text style={styles.logoutBtn}>Sair</Text></TouchableOpacity>
       </View>
-
       <ScrollView style={styles.content}>
         <View style={styles.userCard}>
           <Text style={styles.userName}>{user?.nome_completo || 'Usuário'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
-          {user?.turma && <Text style={styles.userTurma}>Turma: {user.turma}</Text>}
-          {user?.adm && <Text style={styles.admBadge}>ADMINISTRADOR</Text>}
         </View>
-
-        {/* Seção de Tickets */}
         {tickets.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🎟️ Meus Tickets de Sorteio</Text>
-            <View style={styles.ticketsContainer}>
-              {tickets.map((ticket) => (
-                <View key={ticket.id} style={styles.ticketCard}>
-                  <Image 
-                    source={require('../../assets/images/icon.png')} 
-                    style={styles.ticketImage}
-                  />
-                  <View style={styles.ticketInfo}>
-                    <Text style={styles.ticketLabel}>DEBUG PASTELARIA</Text>
-                    <Text style={styles.ticketTitle}>SORTEIO DE FONE DE OUVIDO!</Text>
-                    <Text style={styles.ticketNumber}>Nº {String(ticket.numero_ticket).padStart(4, '0')}</Text>
-                    <Text style={styles.ticketLuck}>BOA SORTE!</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📋 Meus Pedidos</Text>
-          {loading ? (
-            <ActivityIndicator size="small" color="#D4A574" style={{ marginVertical: 20 }} />
-          ) : pedidos.length === 0 ? (
-            <Text style={styles.infoText}>Nenhum pedido realizado ainda</Text>
-          ) : (
-            pedidos.map((pedido) => (
-              <View key={pedido.id} style={styles.pedidoCard}>
-                <View style={styles.pedidoHeader}>
-                  <Text style={styles.pedidoId}>Pedido #{pedido.id.slice(0, 8)}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(pedido.status) }]}>
-                    <Text style={styles.statusText}>{pedido.status.toUpperCase()}</Text>
-                  </View>
-                </View>
-                
-                <View style={styles.itensContainer}>
-                  {pedido.itens_pedido.map((item) => (
-                    <Text key={item.id} style={styles.itemText}>
-                      • {item.quantidade}x {item.produtos?.nome || 'Produto'} (R$ {(item.preco_unitario * item.quantidade).toFixed(2)})
-                    </Text>
-                  ))}
-                </View>
-
-                <View style={styles.pedidoFooter}>
-                  <Text style={styles.pedidoTotal}>Total: R$ {pedido.total.toFixed(2)}</Text>
-                  <Text style={styles.pedidoData}>
-                    {new Date(pedido.created_at).toLocaleDateString('pt-BR')}
-                  </Text>
-                </View>
-                
-                <View style={styles.checkContainer}>
-                  <Text style={[styles.checkText, pedido.pagou && styles.checkActive]}>
-                    {pedido.pagou ? '✅ Pago' : '❌ Não Pago'}
-                  </Text>
-                  <Text style={[styles.checkText, pedido.retirou && styles.checkActive]}>
-                    {pedido.retirou ? '✅ Retirado' : '❌ Não Retirado'}
-                  </Text>
+            <Text style={styles.sectionTitle}>🎟️ Meus Tickets</Text>
+            {tickets.map((ticket) => (
+              <View key={ticket.id} style={styles.ticketCard}>
+                <Image source={require('../../assets/images/icon.jpeg')} style={styles.ticketImage} />
+                <View style={styles.ticketInfo}>
+                  <Text style={styles.ticketLabel}>DEBUG PASTELARIA</Text>
+                  <Text style={styles.ticketTitle}>SORTEIO DE FONE!</Text>
+                  <Text style={styles.ticketNumber}>Nº {String(ticket.numero_ticket).padStart(4, '0')}</Text>
                 </View>
               </View>
-            ))
-          )}
-        </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -198,35 +64,17 @@ const styles = StyleSheet.create({
   headerLeft: { flexDirection: 'row', alignItems: 'center' },
   headerLogo: { width: 30, height: 30, borderRadius: 15, marginRight: 10, borderWidth: 1, borderColor: '#fff' },
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-  logoutBtn: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+  logoutBtn: { color: '#fff', fontWeight: 'bold' },
   content: { flex: 1 },
-  userCard: { backgroundColor: '#fff', padding: 20, margin: 15, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-  userName: { fontSize: 20, fontWeight: 'bold', color: '#333' },
-  userEmail: { fontSize: 14, color: '#666', marginTop: 2 },
-  userTurma: { fontSize: 14, color: '#D4A574', fontWeight: '600', marginTop: 5 },
-  admBadge: { backgroundColor: '#ff6b6b', color: '#fff', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, fontSize: 10, fontWeight: 'bold', alignSelf: 'flex-start', marginTop: 10 },
+  userCard: { backgroundColor: '#fff', padding: 20, margin: 15, borderRadius: 12, elevation: 3 },
+  userName: { fontSize: 20, fontWeight: 'bold' },
+  userEmail: { fontSize: 14, color: '#666' },
   section: { paddingHorizontal: 15, marginBottom: 25 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 15 },
-  infoText: { textAlign: 'center', color: '#999', marginVertical: 20 },
-  pedidoCard: { backgroundColor: '#fff', padding: 15, marginBottom: 12, borderRadius: 12, borderLeftWidth: 5, borderLeftColor: '#D4A574', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 },
-  pedidoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  pedidoId: { fontSize: 14, fontWeight: 'bold', color: '#333' },
-  statusBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12 },
-  statusText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
-  itensContainer: { marginVertical: 10, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 10 },
-  itemText: { fontSize: 13, color: '#555', marginBottom: 4 },
-  pedidoFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 },
-  pedidoTotal: { fontSize: 16, fontWeight: 'bold', color: '#D4A574' },
-  pedidoData: { fontSize: 12, color: '#999' },
-  checkContainer: { flexDirection: 'row', marginTop: 10, borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 10 },
-  checkText: { fontSize: 12, color: '#999', marginRight: 15 },
-  checkActive: { color: '#4CAF50', fontWeight: 'bold' },
-  ticketsContainer: { flexDirection: 'column' },
-  ticketCard: { backgroundColor: '#FFF8E1', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#FFE082', marginBottom: 12, flexDirection: 'row', alignItems: 'center', elevation: 2 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  ticketCard: { backgroundColor: '#FFF8E1', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#FFE082', marginBottom: 12, flexDirection: 'row', alignItems: 'center' },
   ticketImage: { width: 60, height: 60, borderRadius: 30, marginRight: 15, borderWidth: 2, borderColor: '#D4A574' },
   ticketInfo: { flex: 1 },
   ticketLabel: { fontSize: 10, color: '#D4A574', fontWeight: 'bold' },
-  ticketTitle: { fontSize: 14, fontWeight: 'bold', color: '#333', marginVertical: 2 },
+  ticketTitle: { fontSize: 14, fontWeight: 'bold' },
   ticketNumber: { fontSize: 18, fontWeight: 'bold', color: '#D4A574' },
-  ticketLuck: { fontSize: 11, color: '#666', fontWeight: 'bold', marginTop: 2 },
 });
