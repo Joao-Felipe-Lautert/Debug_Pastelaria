@@ -1,8 +1,8 @@
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../supabaseConfig';
 
 interface ItemPedido {
   id: string;

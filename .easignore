@@ -1,0 +1,6 @@
+# Conteúdo do .easignore
+node_modules/
+.git/
+lib
+supabase.ts
+lib\supabase.ts
